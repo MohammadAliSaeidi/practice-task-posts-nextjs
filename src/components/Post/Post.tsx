@@ -1,30 +1,65 @@
 'use client'
 
-import {PostType} from '@/types/Post.type'
-import {Card, CardActions, CardContent, Checkbox, Divider, Typography} from "@mui/material";
-import Favorite from '@mui/icons-material/Favorite';
-import {FavoriteBorder} from "@mui/icons-material";
+import {PostType, UserType} from '@/types'
+import {
+	Avatar, Card, CardActions, CardContent, CardHeader, CardMedia, Checkbox, Divider, Grid, Skeleton, Typography
+} from "@mui/material";
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import {useEffect, useState} from "react";
+import {QueryFunctionContext, useQuery} from "@tanstack/react-query";
+import {fetchUserById} from "@/services/api";
+
 
 function Post({postData}: { postData: PostType }) {
+	const [imageIsLoaded, setImageIsLoaded] = useState<boolean>(false)
 
-    const sampleContent = postData.content.slice(0, 100);
+	const sampleContent = postData.content.slice(0, 100);
+	const {
+		data: userData, isError: isErrorFetchUser, isLoading: isLoadingFetchUser
+	} = useQuery<UserType | null>({
+									  queryKey: ["user", postData.userId],
+									  queryFn: (queryFunctionContext: QueryFunctionContext) => fetchUserById(queryFunctionContext, postData.userId),
+									  retry: 3,
+								  });
 
-    return (
-        <Card>
-            <CardContent>
-                <Typography variant={"h3"}>{postData.title}</Typography>
-                <Typography variant={"body1"}>{sampleContent}...</Typography>
-            </CardContent>
-            <Divider/>
-            <CardActions>
-                <Checkbox sx={{
-                    '&.Mui-checked': {
-                        color: '#FF4154',
-                    },
-                }} icon={<FavoriteBorder/>} checkedIcon={<Favorite/>}/>
-            </CardActions>
-        </Card>
-    );
+	let cardHeader;
+	if (userData) {
+		cardHeader = <CardHeader
+			avatar={<Avatar>{userData.firstname[0]}</Avatar>}
+			title={`${userData.firstname} ${userData.lastname}`}
+			subheader={postData.updatedAt}
+		/>
+	}
+	else if (isLoadingFetchUser || isErrorFetchUser) {
+		cardHeader = <CardHeader
+			avatar={<Skeleton variant="circular" width={40} height={40}/>}
+			title={<Skeleton sx={{marginBottom: 4}} variant="rounded" width={210} height={20}/>}
+			subheader={<Skeleton variant="rounded" width={54} height={20}/>}
+		/>
+	}
+
+	return <Grid item xs={1} sm={2} md={6}>
+		<Card sx={{minHeight: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
+			{cardHeader}
+
+			{!imageIsLoaded && <Skeleton variant={'rectangular'} height={300}/>}
+			<CardMedia
+				component='img'
+				onLoad={() => setImageIsLoaded(true)}
+				alt={postData.slug}
+				src={postData.image}
+				loading="lazy"
+			/>
+			<CardContent>
+				<Typography gutterBottom variant="h5" component="div">{postData.title}</Typography>
+				<Typography variant={"body2"} color="text.secondary">{sampleContent}</Typography>
+			</CardContent>
+			<CardActions>
+				<Checkbox icon={<BookmarkBorderIcon/>} checkedIcon={<BookmarkIcon/>}/>
+			</CardActions>
+		</Card>
+	</Grid>
 }
 
 export default Post;
