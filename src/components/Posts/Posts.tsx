@@ -2,12 +2,16 @@
 
 import {useQuery} from "@tanstack/react-query";
 import {fetchPosts} from "@/services/api";
+import {PostType} from '@/types/Post.type'
+import Post from '@/components/Post'
+import {Stack, Typography, Container} from "@mui/material";
 
 function Posts() {
-    const {data, isError, isLoading} = useQuery({
-        queryKey: ["posts"],
-        queryFn: fetchPosts,
-    });
+    const {data: postsData, isError, isLoading} =
+        useQuery<PostType[]>({
+            queryKey: ["posts"],
+            queryFn: fetchPosts,
+        });
 
     if (isLoading) {
         return <p>Loading...</p>
@@ -17,17 +21,15 @@ function Posts() {
         return <p>Error fetching posts</p>
     }
 
-    console.log('data', data)
-
     return (
-        <div>
-            <h1>Posts</h1>
-            <ul>
-                {data?.map(d => (
-                    <li key={d.id}>{d.title}</li>
+        <Container>
+            <Typography variant={"h2"}>Posts</Typography>
+            <Stack spacing={2} direction={"column"}>
+                {postsData?.map(postData => (
+                    <Post postData={postData}/>
                 ))}
-            </ul>
-        </div>
+            </Stack>
+        </Container>
     );
 }
 
