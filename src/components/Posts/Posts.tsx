@@ -10,7 +10,7 @@ function Posts() {
 	const {data: postsData, isError, isLoading} = useQuery<PostType[]>({
 																		   queryKey: ["posts"],
 																		   queryFn: fetchPosts,
-																		   // refetchInterval: 10000,
+																		   refetchInterval: 10000,
 																		   retry: 3,
 																	   });
 

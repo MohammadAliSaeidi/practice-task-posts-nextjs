@@ -9,6 +9,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import {useEffect, useState} from "react";
 import {QueryFunctionContext, useQuery} from "@tanstack/react-query";
 import {fetchUserById} from "@/services/api";
+import Link from "next/link";
 
 
 function Post({postData}: { postData: PostType }) {
@@ -28,7 +29,7 @@ function Post({postData}: { postData: PostType }) {
 		cardHeader = <CardHeader
 			avatar={<Avatar>{userData.firstname[0]}</Avatar>}
 			title={`${userData.firstname} ${userData.lastname}`}
-			subheader={postData.updatedAt}
+			subheader={postData.publishedAt}
 		/>
 	}
 	else if (isLoadingFetchUser || isErrorFetchUser) {
@@ -54,6 +55,7 @@ function Post({postData}: { postData: PostType }) {
 			<CardContent>
 				<Typography gutterBottom variant="h5" component="div">{postData.title}</Typography>
 				<Typography variant={"body2"} color="text.secondary">{sampleContent}</Typography>
+				<Link href={`/posts?postId=${postData.id}`}>{postData.id}</Link>
 			</CardContent>
 			<CardActions>
 				<Checkbox icon={<BookmarkBorderIcon/>} checkedIcon={<BookmarkIcon/>}/>

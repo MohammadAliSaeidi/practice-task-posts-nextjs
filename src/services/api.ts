@@ -39,3 +39,21 @@ export async function fetchUserById({signal}: QueryFunctionContext, userId: numb
 		return null;
 	}
 }
+
+
+export async function fetchPostById({signal}: QueryFunctionContext, postId: string): Promise<PostType | null> {
+	try {
+		const response = await axiosInstance.get(`/posts/${postId}`, {signal});
+		console.log(response)
+		return response.data as PostType;
+	}
+	catch (error: any) {
+		if (error.name === 'AbortError') {
+			console.log('Request aborted');
+		}
+		else {
+			console.error('Error fetching posts:', error);
+		}
+		return null;
+	}
+}

@@ -10,11 +10,26 @@ const darkTheme = createTheme({
     palette: {
         mode: 'dark',
     },
-    // typography:{
-    //     h1: {
-    //         fontSize:
-    //     }
-    // }
+    typography:{
+        h1: {
+            fontSize: '42px'
+        },
+        h2:{
+            fontSize: '36px'
+        },
+        h3:{
+            fontSize: '32px'
+        },
+        h4:{
+            fontSize: '28px'
+        },
+        h5:{
+            fontSize: '24px'
+        },
+        h6:{
+            fontSize: '18px'
+        }
+    }
 });
 
 
