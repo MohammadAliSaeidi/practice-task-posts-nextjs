@@ -4,10 +4,11 @@ import {useSearchParams, useRouter} from 'next/navigation'
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import {QueryFunctionContext, useQuery, useQueryClient} from "@tanstack/react-query";
-import {fetchPostById, fetchUserById} from "@/services/api";
-import {PostType, UserType} from "@/types";
+import {fetchComments, fetchPostById, fetchUserById} from "@/services/api";
+import {CommentType, PostType, UserType} from "@/types";
 import './post.css'
 import {Avatar, CardHeader, Divider, Skeleton} from "@mui/material";
+import Comment from '@/components/Comment'
 
 export default function Post() {
 	const searchParams = useSearchParams()
@@ -41,40 +42,50 @@ export default function Post() {
 								  });
 
 	const {
-		data: commentsData, isError: isErrorFetchCommentsData, isLoading: isLoadingFetchcCmmentsData
-	} = useQuery<UserType | null>({
-									  queryKey: ["user", userId],
-									  queryFn: (queryFunctionContext: QueryFunctionContext) => fetchUserById(queryFunctionContext, userId),
-									  retry: 3,
-									  enabled: !!userId,
-								  });
+		data: commentsData, isError: isErrorFetchCommentsData, isLoading: isLoadingFetchCmmentsData
+	} = useQuery<CommentType[]>({
+									queryKey: ["comments"], queryFn: fetchComments, retry: 3,
+								});
 
 	if (isLoadingFetchPost) {
 		return <p>Loading...</p>
 	}
 
-	let authorInfo;
-	if (userData && postData) {
-		authorInfo = <CardHeader sx={{paddingInline: 0}}
-								 avatar={<Avatar>{userData.firstname[0]}</Avatar>}
-								 title={`${userData.firstname} ${userData.lastname}`}
-								 subheader={postData.publishedAt}
-		/>
+	function AuthorInfo() {
+		if (userData && postData) {
+			return <CardHeader sx={{paddingInline: 0}}
+							   avatar={<Avatar>{userData.firstname[0]}</Avatar>}
+							   title={`${userData.firstname} ${userData.lastname}`}
+							   subheader={postData.publishedAt}
+			/>
+		}
+		else if (isLoadingFetchUser || isErrorFetchUser) {
+			return <CardHeader
+				avatar={<Skeleton variant="circular" width={40} height={40}/>}
+				title={<Skeleton sx={{marginBottom: 4}} variant="rounded" width={210} height={20}/>}
+				subheader={<Skeleton variant="rounded" width={54} height={20}/>}
+			/>
+		}
 	}
-	else if (isLoadingFetchUser || isErrorFetchUser) {
-		authorInfo = <CardHeader
-			avatar={<Skeleton variant="circular" width={40} height={40}/>}
-			title={<Skeleton sx={{marginBottom: 4}} variant="rounded" width={210} height={20}/>}
-			subheader={<Skeleton variant="rounded" width={54} height={20}/>}
-		/>
+
+	function Comments() {
+		if(commentsData){
+			return commentsData.map(comment => {
+				if(comment.postId === parseInt(postId))
+				{
+					return <Comment data={comment}/>
+				}
+			})
+		}
 	}
 
 	return (<Container maxWidth={"lg"} sx={{marginBlock: '24px'}}>
 		<Typography sx={{marginBottom: '1rem'}} variant="h1">{postData && postData.title}</Typography>
-		{authorInfo}
+		{<AuthorInfo />}
 		<Divider sx={{marginBlock: 3}}/>
 		{postData && <Typography sx={{marginBlock: 3}} variant={'body1'}>{postData.content}</Typography>}
 		<Divider sx={{marginBlock: 3}}/>
 		<Typography variant="h2">Comments</Typography>
+		<Comments />
 	</Container>);
 }

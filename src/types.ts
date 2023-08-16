@@ -53,3 +53,10 @@ export interface Company {
 	catchPhrase: string
 	bs: string
 }
+
+export interface CommentType {
+	id: number
+	postId: number
+	userId: number
+	comment: string
+}

@@ -1,5 +1,5 @@
 import axios from "axios";
-import {PostType, UserType} from "@/types";
+import {PostType, UserType, CommentType} from "@/types";
 import {QueryFunctionContext} from "react-query";
 
 const axiosInstance = axios.create({
@@ -34,7 +34,7 @@ export async function fetchUserById({signal}: QueryFunctionContext, userId: numb
 			console.log('Request aborted');
 		}
 		else {
-			console.error('Error fetching posts:', error);
+			console.error('Error fetching user by id: ' + userId, error);
 		}
 		return null;
 	}
@@ -52,8 +52,25 @@ export async function fetchPostById({signal}: QueryFunctionContext, postId: stri
 			console.log('Request aborted');
 		}
 		else {
-			console.error('Error fetching posts:', error);
+			console.error('Error fetching post by id: ' + postId, error);
 		}
 		return null;
+	}
+}
+
+export async function fetchComments({signal}: QueryFunctionContext): Promise<CommentType[]> {
+	console.log('fetching posts')
+	try {
+		const response = await axiosInstance.get('/comments', {signal});
+		return response.data as CommentType[];
+	}
+	catch (error: any) {
+		if (error.name === 'AbortError') {
+			console.log('Request aborted');
+		}
+		else {
+			console.error('Error fetching comments:', error);
+		}
+		return [];
 	}
 }
