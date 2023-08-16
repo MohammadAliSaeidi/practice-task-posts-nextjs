@@ -9,44 +9,39 @@ import CssBaseline from '@mui/material/CssBaseline';
 const darkTheme = createTheme({
     palette: {
         mode: 'dark',
-    },
-    typography:{
+    }, typography: {
         h1: {
             fontSize: '42px'
-        },
-        h2:{
+        }, h2: {
             fontSize: '36px'
-        },
-        h3:{
+        }, h3: {
             fontSize: '32px'
-        },
-        h4:{
+        }, h4: {
             fontSize: '28px'
-        },
-        h5:{
+        }, h5: {
             fontSize: '24px'
-        },
-        h6:{
+        }, h6: {
             fontSize: '18px'
+        }, body1: {
+            lineHeight: 2
+        },
+        body2:{
+            lineHeight: 2
         }
     }
 });
 
 
 function Providers({children}: React.PropsWithChildren) {
-    const [client] = React.useState(
-        new QueryClient({defaultOptions: {queries: {staleTime: 5000}}})
-    );
+    const [client] = React.useState(new QueryClient({defaultOptions: {queries: {staleTime: 5000}}}));
 
-    return (
-        <QueryClientProvider client={client}>
-            <ThemeProvider theme={darkTheme}>
-                <CssBaseline />
-                {children}
-                <ReactQueryDevtools initialIsOpen={false}/>
-            </ThemeProvider>
-        </QueryClientProvider>
-    );
+    return (<QueryClientProvider client={client}>
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline/>
+            {children}
+            <ReactQueryDevtools initialIsOpen={false}/>
+        </ThemeProvider>
+    </QueryClientProvider>);
 }
 
 export default Providers;
